@@ -5,3 +5,10 @@ protected/runtime/*
 protected/data/*.db
 themes/classic/views/
 /nbproject/private/
+#IDE'S
+nbproject/*
+#Vendor de yii
+vendor/
+#Carpeta de carga de archivos
+web/uploads/*
+

@@ -99,12 +99,15 @@ class Uploader extends Component {
 
             // Generar carpeta para archivo original
             $this->filePath = $this->generatePath(self::FILE_DIR);
+            echo "<br>Carpeta para archivo original:" . $this->filePath;
 
             // Generar carpeta para imagen miniatura
             $this->thumbnailPath = $this->generatePath(self::THUMB_DIR);
             $this->fileRoute = $this->filePath . '/' . $this->fileName . '.' . $this->fileExtension;
             $this->thumbRoute = $this->thumbnailPath . '/' . $this->fileThumbName . '.' . $this->fileExtension;
             $this->fileType = $oFile->type;
+            
+            echo "Tipo de archivo recibido:" . $oFile->type . "";
             
 
             if (strpos($oFile->type, 'image') !== FALSE) { //Si el tipo es cualquier tipo de imágen

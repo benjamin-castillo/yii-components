@@ -65,16 +65,19 @@ class SiteController extends Controller {
         return $this->render('index');
     }
 
-    public function actionTest() {
+    public function actionUpload() {
 
         echo "<br><br>";
         $request = Yii::$app->request;
+        echo "<br>Variables relacionadas con configuración de servidor";
+        echo "<br>Tamaño máximo de carga de archivos: " . ini_get('upload_max_filesize');
+        echo "<br>Tamaño máximo de recepción de archivos: " . ini_get('upload_max_filesize');
 
         if ($request->isPost) {
             echo "<br>Se recibio post";
             $filePost = new Uploader();
             // Ruta para procesar todas las imagenes, dicha carpeta debe tener permisos 777
-            $basePath = '/var/www/html/basic/web/uploads'; 
+            $basePath = '/var/www/html/yiicomponents/web/uploads'; 
             $filePost->setUploadPath($basePath);
             $filePost->setMakeThumbnail(true);
 //            echo "<pre>";
@@ -85,42 +88,7 @@ class SiteController extends Controller {
             echo "<br>NO se  recibio post";
         }
 
-
-//        $error = $filePost->getError();
-//        if(isset($error)){
-//             echo $error;die();
-//        }
-//        $documento = $filePost->getResult();
-//        if(isset($documento))
-//        { 
-//
-//            
-//            $guiaArchivo = new GuiaArchivo();
-//            $guiaArchivo->ruta = $documento['normal'];
-//            if(isset($documento['thumbnail'])) {
-//                $guiaArchivo->ruta_thumbnail = $documento['thumbnail'];
-//            }
-//            
-//            $guiaArchivo->save();
-//            
-//            $guiaArchivoRelacion = new GuiaArchivoRelacion();
-//            $guiaArchivoRelacion->guia_id = $guia->id;        
-//            $guiaArchivoRelacion->guia_archivo_id = $guiaArchivo->id;
-//            $guiaArchivoRelacion->save();
-//                    
-//            $url = Yii::getAlias('@webFiles'). $documento['normal'];
-//            $message = "Mensaje de prueba de carga exitosa";
-//            echo '<script>'
-//                    . 'window.parent.CKEDITOR.tools.callFunction('.$funcNum.', "'.$url.'", "'.$message.'");'
-//                    //.' alert("mensaje de prueba hola hoal hola hola"); '
-//                    .' window.parent.ajustarGuiaID('.$guia->id.'); '
-//                . '</script>';
-//            exit;
-//            
-//
-//        }
-
-        return $this->render('_test');
+        return $this->render('_upload_examaple');
     }
 
     /**
