@@ -84,6 +84,15 @@ class SiteController extends Controller {
 //            var_dump($_FILES);
 //            echo "</pre>";
             $errores = $filePost->save('upload');
+
+            if(empty($errores)){
+                echo "<br>Archivo procesado con exito:";
+                echo "<br>Carpeta de archivos procesados:" . $basePath . "/files/";
+            echo "<br>Nombre de archivo procesado:" . $filePost->fileName . "." . $filePost->fileExtension;
+            }else {
+                echo "<br>No se logro cargar el archivo";
+            }
+                    
         } else {
             echo "<br>NO se  recibio post";
         }

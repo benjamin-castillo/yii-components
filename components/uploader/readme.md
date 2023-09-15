@@ -29,11 +29,14 @@ Ejemplo:
 
 ## Ejemplo de uso
 
-Valla a la vista "web/site/upload"
+La url para entrar será "web/site/upload"
 
-El ejemplo del codigo esta en:
+En la vista encontrará el formulario:
 
 "views/site/_upload"
+
+En el controller "SiteController.php" y dentro del metodo "actionUpload()" se
+encuentra el ejemplo de uso. 
 
 
 

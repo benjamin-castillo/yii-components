@@ -37,9 +37,9 @@ class Uploader extends Component {
      * @var boolean
      */
     public $thumbnail = false;
-    private $fileName;
+    public $fileName;
     private $fileThumbName;
-    private $fileExtension;
+    public $fileExtension;
     private $thumbnailPath;
     private $fileRoute;
     private $thumbRoute;
@@ -86,10 +86,9 @@ class Uploader extends Component {
 
         if (empty($_FILES)) {
             $this->errors .= "No se recibió el archivo";
-            echo "<br>No se recibió el archivo";
+            die("Error, no se recibió el archivo en el POST.");
             return;
         } else {
-            echo "<br>Si se recibio archivo";
             // Obtiene nombre de archivo
             $this->fileName = $this->preserveBaseName ? $oFile->getBaseName() : date('dmy') . time() . rand();
             // Obtiene nombre de archivo thumb
@@ -99,27 +98,29 @@ class Uploader extends Component {
 
             // Generar carpeta para archivo original
             $this->filePath = $this->generatePath(self::FILE_DIR);
-            echo "<br>Carpeta para archivo original:" . $this->filePath;
+            //echo "<br>Carpeta para archivo original:" . $this->filePath;
 
             // Generar carpeta para imagen miniatura
             $this->thumbnailPath = $this->generatePath(self::THUMB_DIR);
+            //echo "<br>Ruta minuatura:" . $this->thumbnailPath;
             $this->fileRoute = $this->filePath . '/' . $this->fileName . '.' . $this->fileExtension;
+            //echo "<br>Ruta de archivo:" . $this->fileRoute;
             $this->thumbRoute = $this->thumbnailPath . '/' . $this->fileThumbName . '.' . $this->fileExtension;
             $this->fileType = $oFile->type;
             
-            echo "Tipo de archivo recibido:" . $oFile->type . "";
+            //echo "<br>Tipo de archivo recibido:" . $oFile->type . "";
             
 
             if (strpos($oFile->type, 'image') !== FALSE) { //Si el tipo es cualquier tipo de imágen
                 try {
                     $this->saveImage($oFile);
                 } catch (\Imagine\Exception\RuntimeException $e) {
-                    die("<br>Se ha producido un error al intentar renderizar la imagen");
+                    die("<br>Se ha producido un error al intentar procesar el archivo de la imagen");
+                    var_dump($e);
                     return NULL;
                 }
             } else { // Si no es un archivo de imagen
                 echo "<br>El archivo recibido no es una imagen la images es de tipo: " . $oFile->type;
-                //$oFile->saveAs(Yii::getAlias('@uploads') . '/' . $this->fileRoute);
             }
 
         }
@@ -130,7 +131,6 @@ class Uploader extends Component {
      * @param type $filePost
      */
     public function saveImage($filePost) {
-        echo "<br>Redomensionando imagen";
         $tempPath = $this->getUploadPath() . $this->generatePath(self::TEMP_DIR);
         $tempImg = $tempPath . '/' . $this->fileName . '.' . $this->fileExtension;
         if ($filePost->saveAs($tempImg)) { //Crea una copia del archivo original
