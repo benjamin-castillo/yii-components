@@ -1,11 +1,13 @@
 # Documentación de componente Upload
 
 ## Introducción
-La presente es una librería de Yii framework capaz de subir imagenes al servidor
-y redimencionarlas mediante parámetros consigurables, hasta la version 1.0.
+
+La presente es una librería de Yii framework capaz de subir archivos al servidor
+contiene algunos meotodos para redimencionar imagenes mediante parámetros consigurables.
 
 ## Librerias
-Este componente requiere la siguiente libreria
+
+Este componente requiere la siguiente libreria para poder procesar imágenes
 
 ```
 "yiisoft/yii2-imagine": "*"
@@ -19,27 +21,22 @@ su proyecto /web/uploads puede usar el comando.
 ```
 mkdir /var/www/html/yiicomponents/web/uploads/
 ```
-Debe dar permiso de escritura a a la carpeta, 
+
+Debe dar permiso de escritura a a la carpeta,
 
 Ejemplo:
 
 ```
- chmod -R 777 /var/www/html/yiicomponents/web/uploads/ 
+ chmod -R 777 /var/www/html/yiicomponents/web/uploads/
 ```
 
-## Ejemplo de uso
+## Ejemplo de uso con varios tipos de archivos
+
+La url para entrar será "web/site/upload-all-files"
+
+## Ejemplo para procesar imagenes
 
 La url para entrar será "web/site/upload"
-
-En la vista encontrará el formulario:
-
-"views/site/_upload"
-
-En el controller "SiteController.php" y dentro del metodo "actionUpload()" se
-encuentra el ejemplo de uso. 
-
-
-
 
 ## Errores
 

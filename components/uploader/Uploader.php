@@ -7,12 +7,16 @@ use yii\web\UploadedFile;
 use yii\imagine\Image;
 
 /**
- *  Uploader
- *  Componente Yii para manejo de archivos
- * @version 1.0 Septiembre 2023
- * @author <benjamin.castillo.arriaga@gmail.com>
+ * Uploader
+ * Componente Yii para control de carga de archivos en servidor
+ * @version 1.01 Febrero 2024 for PHP 8.0 > 8.2
+ * @author Benjamin Castillo Arriaga <benjamin.castillo.arriaga@gmail.com>
+ * 
+ *  Usted puede consulta la libreria original del autor en: https://github.com/benjamin-castillo/yii-components/
+ *  
  */
-class Uploader extends Component {
+class Uploader extends Component
+{
 
     const TEMP_DIR = '/temp';
 
@@ -25,15 +29,15 @@ class Uploader extends Component {
     public $errors;
 
     /**
-     * Indica si se debe conservar el nombre original del archivo, pore seguridad
-     * por defadul es false pero se puede cambiar en caso de ser necesario
+     * Indica si se debe conservar el nombre original del archivo, por seguridad
+     * por defaul es false pero se puede cambiar en caso de ser necesario
      * @var boolean
      * @default false
      */
     public $preserveBaseName = false;
 
     /**
-     * Indica si es necesario crear arhivo thumbnail
+     * Indica si es necesario crear arhivo thumbnail sólo para el caso de carga de imagenes
      * @var boolean
      */
     public $thumbnail = false;
@@ -66,8 +70,8 @@ class Uploader extends Component {
      * @var bool por si deseamos conservar originales
      * @default false
      */
-    public $preserveOriginalFile = false;
-    
+    public $preserveOriginalFile = true;
+
     /**
      * @var integer tamaño del thumbnail en pixeles
      * @default 128
@@ -75,22 +79,31 @@ class Uploader extends Component {
     public $thumbnailBaseSize = 128;
 
     /**
+     * Metodo para almacenar el debug.
+     */
+    public $logDebug = "";
+
+    /**
      * Metodo lógico para guardar archivos
      */
-    public function save($post) {
+    public function save($post)
+    {
 
         $oFile = UploadedFile::getInstanceByName($post);
-        echo "<pre>";
-        var_dump($oFile);
-        echo "</pre>";
+        // echo "<pre>";
+        // var_dump($oFile);
+        // echo "</pre>";
 
         if (empty($_FILES)) {
             $this->errors .= "No se recibió el archivo";
             die("Error, no se recibió el archivo en el POST.");
             return;
         } else {
-            // Obtiene nombre de archivo
-            $this->fileName = $this->preserveBaseName ? $oFile->getBaseName() : date('dmy') . time() . rand();
+
+            if (empty($this->fileName)) {
+                $this->fileName = $this->preserveBaseName ? $oFile->getBaseName() : date('dmy') . time() . rand();
+            }
+
             // Obtiene nombre de archivo thumb
             $this->fileThumbName = $this->thumbnail ? $this->fileName . '_thumb' : NULL;
             //Obtiene nombre de extension
@@ -107,9 +120,8 @@ class Uploader extends Component {
             //echo "<br>Ruta de archivo:" . $this->fileRoute;
             $this->thumbRoute = $this->thumbnailPath . '/' . $this->fileThumbName . '.' . $this->fileExtension;
             $this->fileType = $oFile->type;
-            
-            //echo "<br>Tipo de archivo recibido:" . $oFile->type . "";
-            
+
+            $this->logDebug .= "<br>Tipo de archivo recibido:" . $oFile->type . "";
 
             if (strpos($oFile->type, 'image') !== FALSE) { //Si el tipo es cualquier tipo de imágen
                 try {
@@ -120,17 +132,40 @@ class Uploader extends Component {
                     return NULL;
                 }
             } else { // Si no es un archivo de imagen
-                echo "<br>El archivo recibido no es una imagen la images es de tipo: " . $oFile->type;
+
+                $this->saveFile($oFile);
             }
 
         }
     }
 
     /**
+     *  Guarda archivo de cualquier extencion sin procesarlo
+     * @param type $filePost
+     */
+    public function saveFile($filePost)
+    {
+        $tempPath = $this->getUploadPath() . $this->generatePath(self::TEMP_DIR);
+
+        $tempImg = $tempPath . '/' . $this->fileName . '.' . $this->fileExtension;
+
+        $this->logDebug .= "<br>Archivo a guardar:" . $tempImg;
+
+
+        if ($filePost->saveAs($tempImg)) { //Crea una copia del archivo original recibido por post
+            $this->logDebug .= "<br>Archivo cargado con exito en:" . $tempImg;
+        } else {
+            die("<br>Error no se logro guardar el archivo");
+        }
+    }
+
+
+    /**
      *  Procesa la imágen para redimensional
      * @param type $filePost
      */
-    public function saveImage($filePost) {
+    public function saveImage($filePost)
+    {
         $tempPath = $this->getUploadPath() . $this->generatePath(self::TEMP_DIR);
         $tempImg = $tempPath . '/' . $this->fileName . '.' . $this->fileExtension;
         if ($filePost->saveAs($tempImg)) { //Crea una copia del archivo original
@@ -142,17 +177,17 @@ class Uploader extends Component {
             $image = new Image(); // Crear un objeto de tipo imagen
             // redimensiona la imagen
             $image->getImagine()
-                    ->open($tempImg)
-                    ->thumbnail(new \Imagine\Image\Box($newImgSize['width'], $newImgSize['height']))
-                    ->save($this->getUploadPath() . $this->fileRoute, ['quality' => 100]);
+                ->open($tempImg)
+                ->thumbnail(new \Imagine\Image\Box($newImgSize['width'], $newImgSize['height']))
+                ->save($this->getUploadPath() . $this->fileRoute, ['quality' => 100]);
 
             if ($this->thumbnail) {
                 $newImgThumbSize = $this->getNewImageSize($tempImgSize['width'], $tempImgSize['height'], TRUE);
                 $imageThumb = new Image();
                 $imageThumb->getImagine()
-                        ->open($tempImg)
-                        ->thumbnail(new \Imagine\Image\Box($newImgThumbSize['width'], $newImgThumbSize['height']))
-                        ->save($this->getUploadPath() . $this->thumbRoute, ['quality' => 100]);
+                    ->open($tempImg)
+                    ->thumbnail(new \Imagine\Image\Box($newImgThumbSize['width'], $newImgThumbSize['height']))
+                    ->save($this->getUploadPath() . $this->thumbRoute, ['quality' => 100]);
             }
 
             if (!$this->preserveOriginalFile) {
@@ -169,7 +204,8 @@ class Uploader extends Component {
      * @param bool $thumbnail Booleano que indica si es la imagen mÃ¡s grande o thumbnail
      * @return array - ['width' => $width, 'height' => $height]
      */
-    public function getNewImageSize($width, $height, $thumbnail = false) {
+    public function getNewImageSize(int $width, int $height, bool $thumbnail = false)
+    {
         $base = $thumbnail ? $this->thumbnailBaseSize : $this->imageBaseSize;
 
         if (($height > $width) && ($height > $base)) {
@@ -194,7 +230,8 @@ class Uploader extends Component {
      * @param type $imgPath
      * @return type
      */
-    public function getImgSize($imgPath) {
+    public function getImgSize($imgPath)
+    {
         $imagine = new Image();
         $imageTemp = $imagine->getImagine()->open($imgPath);
 
@@ -204,21 +241,24 @@ class Uploader extends Component {
         ];
     }
 
-    public function getUploadPath() {
+    public function getUploadPath()
+    {
         return $this->basePath;
     }
 
-    public function setUploadPath($basePath) {
+    public function setUploadPath(string $basePath)
+    {
         $this->basePath = $basePath;
         return;
     }
-    
+
     /**
      * Define si se va a crear automáticamente imagen de miniatura
      * @param Boolan $makeThumnail
      */
-    public function setMakeThumbnail($makeThumbnail){
-        $this->thumbnail = $makeThumbnail; 
+    public function setMakeThumbnail(bool $makeThumbnail)
+    {
+        $this->thumbnail = $makeThumbnail;
     }
 
     /**
@@ -226,7 +266,8 @@ class Uploader extends Component {
      * @param type $path
      * @return null
      */
-    public function generatePath($path) {
+    public function generatePath(string $path)
+    {
         $pathTemp = $this->getUploadPath() . $path;
         if (!file_exists($pathTemp)) {
             if (!mkdir($pathTemp, 0755, true)) {
@@ -236,4 +277,46 @@ class Uploader extends Component {
         }
         return $path;
     }
+
+
+    public function setPreserveOriginalFile(bool $preserve)
+    {
+        $this->preserveOriginalFile = $preserve;
+    }
+
+    public function getPreserveOriginalFile()
+    {
+        return $this->preserveOriginalFile;
+    }
+
+    /**
+     * Retorna informacion si se genera un error
+     * @return null
+     * */
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
+    /**
+     * Ingresar el nombre del archivo. No debe llevar nombre de extension
+     * @param type $path
+     * @return null
+     */
+    public function setFileName(string $filename)
+    {
+        $this->fileName = $filename;
+    }
+
+    /**
+     * Obtiene el nombre del archivo
+     * @param type $path
+     * @return null
+     */
+    public function getFileName(string $filename)
+    {
+        return $this->fileName;
+    }
+
+
 }
