@@ -74,13 +74,6 @@ class SiteController extends Controller
         echo "<br><br>";
         echo "<h1>Ejemplo para procesar imagenes</h1>";
         $request = Yii::$app->request;
-        echo "<br>Variables relacionadas con configuración de servidor";
-        echo "<br>Tamaño máximo de carga de archivos: (upload_max_filesize)" . ini_get('upload_max_filesize');
-        echo "<br>Tamaño máximo de recepción de archivos (post_max_size): " . ini_get('post_max_size');
-        echo "<br>Limite de memoria (memory_limit): " . ini_get('memory_limit');
-        echo "<br>Tiempo maximo de ejecución (max_execution_time): " . ini_get('max_execution_time');
-
-
 
         if ($request->isPost) {
             echo "<br>Se recibio post";
@@ -115,12 +108,6 @@ class SiteController extends Controller
         echo "<br><br>";
         echo "<h1>Ejemplo para procesar varios tipos de archivos</h1>";
         $request = Yii::$app->request;
-        echo "<br>Variables relacionadas con configuración de servidor";
-        echo "<br>Tamaño máximo de carga de archivos: (upload_max_filesize)" . ini_get('upload_max_filesize');
-        echo "<br>Tamaño máximo de recepción de archivos (post_max_size): " . ini_get('post_max_size');
-        echo "<br>Limite de memoria (memory_limit): " . ini_get('memory_limit');
-        echo "<br>Tiempo maximo de ejecución (max_execution_time): " . ini_get('max_execution_time');
-
 
         if ($request->isPost) {
             echo "<br>Se recibio post";
@@ -129,15 +116,15 @@ class SiteController extends Controller
             $basePath = '/var/www/html/yiicomponents/web/uploads';
             $filePost->setUploadPath($basePath);
             $filePost->setPreserveOriginalFile(false);
-            $filePost->setMakeThumbnail(false);
-            $filePost->setFileName("chuchito2");
+            $filePost->setMakeThumbnail(false);// Ojo aqui
+            $filePost->setFileName("chuchito1356");
             //$filePost->setMakeThumbnail(true);
             //            echo "<pre>";
 //            var_dump($_FILES);
 //            echo "</pre>";
             $errores = $filePost->save('upload');
 
-            echo $filePost->logDebug;
+            echo "Log:" . $filePost->logDebug;
 
             if (empty($errores)) {
                 echo "<br>Archivo procesado con exito:";
