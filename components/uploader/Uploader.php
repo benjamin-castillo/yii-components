@@ -43,6 +43,11 @@ class Uploader extends Component
      */
     public $thumbnail = false;
     public $fileName;
+
+    /** 
+     * Establece un subfolder para crear
+     */
+    public $subFolder;
     private $fileThumbName;
     public $fileExtension;
     private $thumbnailPath;
@@ -117,6 +122,17 @@ class Uploader extends Component
             //$this->filePath = $this->generatePath(self::FILE_DIR);
             //$this->logDebug .= "<br>Carpeta para archivo original:" . $this->filePath;
 
+            //TODO Crear carpeta destino
+
+            if (!empty($this->subFolder)) { // Se generara subfolder
+                echo "<br>Se generara un nuevo folder:" . $this->subFolder;
+                $this->generatePath($this->subFolder);
+            }
+
+            echo "<br>Carpeta a generar:" . $this->basePath;
+
+            //$folderDestinoOriginal = $this->generatePath($this->basePath);
+            //$this->logDebug .= "<br>Intencion crear carpeta:" . $folderDestinoOriginal;
 
             if ($this->thumbnail === true) { // Si desean generar miniatura
                 // Generar carpeta para imagen miniatura
@@ -124,8 +140,19 @@ class Uploader extends Component
                 $this->logDebug .= "<br>Ruta minuatura:" . $this->thumbnailPath;
             }
 
-            $this->fileRoute = $this->filePath . '/' . $this->fileName . '.' . $this->fileExtension;
+
+            if (!empty($this->subFolder)) { // Se generara subfolder
+                $this->fileRoute = $this->filePath . '/' . $this->subFolder . '/' . $this->fileName . '.' . $this->fileExtension;
+            } else {
+                $this->fileRoute = $this->filePath . '/' . $this->fileName . '.' . $this->fileExtension;
+
+            }
             $this->logDebug .= "<br>fileRoute:" . $this->fileRoute;
+
+            echo "<br>fileRoute:" . $this->fileRoute;
+            //die("<br>Fin2");
+
+
             // Agrega la ruta thumb
             $this->thumbRoute = $this->thumbnailPath . '/' . $this->fileThumbName . '.' . $this->fileExtension;
             $this->logDebug .= "<br>Ruta thumb:" . $this->thumbRoute;
@@ -157,7 +184,12 @@ class Uploader extends Component
     public function saveFile($filePost)
     {
         $tempPath = $this->getUploadPath();
-        $tempImg = $tempPath . '/' . $this->fileName . '.' . $this->fileExtension;
+
+        if (!empty($this->subFolder)) { // Se generara subfolder
+            $tempImg = $tempPath . $this->subFolder . '/' . $this->fileName . '.' . $this->fileExtension;
+        } else {
+            $tempImg = $tempPath . '/' . $this->fileName . '.' . $this->fileExtension;
+        }
 
         $this->logDebug .= "<br>Archivo a guardar:" . $tempImg;
 
@@ -210,7 +242,13 @@ class Uploader extends Component
             }
         } else {// Si no se desea procesar la imagen
             $tempPath = $this->getUploadPath();
-            $tempImg = $tempPath . '/' . $this->fileName . '.' . $this->fileExtension;
+
+            if (!empty($this->subFolder)) { // Se generara subfolder
+                $tempImg = $tempPath . $this->subFolder . '/' . $this->fileName . '.' . $this->fileExtension;
+            } else {
+                $tempImg = $tempPath . '/' . $this->fileName . '.' . $this->fileExtension;
+            }
+
 
             $this->logDebug .= "<br>Archivo a guardar:" . $tempImg;
 
@@ -329,12 +367,13 @@ class Uploader extends Component
 
     /**
      * Ingresar el nombre del archivo. No debe llevar nombre de extension
-     * @param string $path
-     * @return null
+     * @param string $filename
+     * @param string $subFolder
      */
-    public function setFileName(string $filename)
+    public function setFileName(string $filename, $subFolder = "")
     {
         $this->fileName = $filename;
+        $this->subFolder = $subFolder;
     }
 
     /**
